@@ -16,7 +16,7 @@ export const ensureDirExists = async () => {
 
 export const selectFile = async () => {
     const res = await dialog.showOpenDialog({
-        defaultPath: join(app.getPath('documents'), 'b2b-pdfs'), 
+        defaultPath: DOCUMENTS_PATH, 
     })
 
     return res;
@@ -29,7 +29,7 @@ export const saveFile = async (
     await ensureDirExists();
 
     const res = await dialog.showSaveDialog({
-        defaultPath: join(app.getPath('documents'), 'b2b-pdfs', fileName), 
+        defaultPath: join(DOCUMENTS_PATH, fileName), 
     })
 
     if (res.canceled || !res.filePath) {
