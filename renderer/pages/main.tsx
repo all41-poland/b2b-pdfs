@@ -23,26 +23,37 @@ export default function NextPage() {
   const [doesB2bDataJsonExist, setDoesB2bDataJsonExist] = useState<boolean>();
 
   const fetchDataFromJson = () => {
-    //@ts-ignore
-    window.ipc.send('readFile', 'Hello')
+
   };
 
   useEffect(() => {
-    fetchDataFromJson();
+    const getSettings = async () => {
+      const res = await window.ipc.invoke('settings:read');
+      if (res.status === "FILE_NOT_FOUND") {
+        setDoesB2bDataJsonExist(false);
+        return;
+      }
+
+      if (res.status === 'OK') {
+        setDoesB2bDataJsonExist(true);
+        setB2bData(res.content);
+        setOrderNumber(res.content.orderNumber);
+        setOrderDate(res.content.orderDate);
+        setInvoiceDate(res.content.invoiceDate);
+        setRealizationDate(res.content.realizationDate);
+        setSpentHours(res.content.spentHours);
+      }
+    }
     //@ts-ignore
     window.ipc.on('readFile', (response: ResponseReadFile) => {
       if (response.status === "FILE_NOT_FOUND") {
         setDoesB2bDataJsonExist(false);
       } else if (response.status === "OK") {
-        setDoesB2bDataJsonExist(true);
-        setB2bData(response.content);
-        setOrderNumber(response.content.orderNumber);
-        setOrderDate(response.content.orderDate);
-        setInvoiceDate(response.content.invoiceDate);
-        setRealizationDate(response.content.realizationDate);
-        setSpentHours(response.content.spentHours);
+        
       }
     })
+
+    getSettings();
   }, []);
 
   const generatePdfDocuments = async () => {
@@ -68,12 +79,12 @@ export default function NextPage() {
         clientCompany={b2bData.client}
       />
     )).toBlob();
-    const status = await window.ipc.invoke('saveFile', { blob: await blob1.arrayBuffer(), fileName: orderFileName });
+    const res = await window.ipc.invoke('saveFile', { data: await blob1.arrayBuffer(), fileName: orderFileName });
       
-    if (status === "Cancelled") {
+    if (res.status === "CANCELLED") {
       return;
     }
-    
+
     const blob2 = await pdf((
       <ProtocolPdfGenerator
         orderNumber={orderNumber}
@@ -85,7 +96,7 @@ export default function NextPage() {
         clientFullName={b2bData.client.fullName}
       />
     )).toBlob();
-    await window.ipc.invoke('saveFile', { blob: await blob2.arrayBuffer(), fileName: protocolFileName });
+    await window.ipc.invoke('saveFile', { data: await blob2.arrayBuffer(), fileName: protocolFileName });
   };
 
   const saveToFile = () => { // TODO
