@@ -1,5 +1,6 @@
 import fs from 'fs';
 import { ipcMain } from 'electron'
+import './saveFile';
 
 const isProd = process.env.NODE_ENV === 'production';
 const portableDir = process.env.PORTABLE_EXECUTABLE_DIR;

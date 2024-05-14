@@ -3,7 +3,6 @@ import Head from 'next/head';
 import { JsonResponse } from '../src/appInterfaces';
 import Loader from '../src/ui/Loader/Loader';
 import Button from '../src/ui/Button';
-import saveAs from 'file-saver';
 import { pdf } from '@react-pdf/renderer';
 import ProtocolPdfGenerator from '../src/ProtocolPdfGenerator/ProtocolPdfGenerator';
 import OrderPdfGenerator from '../src/OrderPdfGenerator/OrderPdfGenerator';
@@ -50,8 +49,10 @@ export default function NextPage() {
     if (!b2bData || !orderDate || !orderNumber || !realizationDate || !invoiceDate || !spentHours) {
       return null;
     }
-    const protocolFileName = `Protokół odbioru prac ${orderNumber}.pdf`;
-    const orderFileName = `Zamówienie usług ${orderNumber}.pdf`;
+    const escapedOrderNumber = orderNumber.replace(/\//g, '_');
+    const protocolFileName = `Protokół odbioru prac ${escapedOrderNumber}.pdf`;
+    const orderFileName = `Zamówienie usług ${escapedOrderNumber}.pdf`;
+
     const blob1 = await pdf((
       <OrderPdfGenerator
         productName={b2bData.productName}
@@ -67,6 +68,12 @@ export default function NextPage() {
         clientCompany={b2bData.client}
       />
     )).toBlob();
+    const status = await window.ipc.invoke('saveFile', { blob: await blob1.arrayBuffer(), fileName: orderFileName });
+      
+    if (status === "Cancelled") {
+      return;
+    }
+    
     const blob2 = await pdf((
       <ProtocolPdfGenerator
         orderNumber={orderNumber}
@@ -78,8 +85,7 @@ export default function NextPage() {
         clientFullName={b2bData.client.fullName}
       />
     )).toBlob();
-    saveAs(blob1, orderFileName);
-    saveAs(blob2, protocolFileName);
+    await window.ipc.invoke('saveFile', { blob: await blob2.arrayBuffer(), fileName: protocolFileName });
   };
 
   const saveToFile = () => { // TODO
