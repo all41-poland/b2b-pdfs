@@ -26,33 +26,25 @@ export default function NextPage() {
 
   };
 
-  useEffect(() => {
-    const getSettings = async () => {
-      const res = await window.ipc.invoke('settings:read');
-      if (res.status === "FILE_NOT_FOUND") {
-        setDoesB2bDataJsonExist(false);
-        return;
-      }
-
-      if (res.status === 'OK') {
-        setDoesB2bDataJsonExist(true);
-        setB2bData(res.content);
-        setOrderNumber(res.content.orderNumber);
-        setOrderDate(res.content.orderDate);
-        setInvoiceDate(res.content.invoiceDate);
-        setRealizationDate(res.content.realizationDate);
-        setSpentHours(res.content.spentHours);
-      }
+  const getSettings = async () => {
+    const res = await window.ipc.invoke('settings:read');
+    if (res.status === "FILE_NOT_FOUND") {
+      setDoesB2bDataJsonExist(false);
+      return;
     }
-    //@ts-ignore
-    window.ipc.on('readFile', (response: ResponseReadFile) => {
-      if (response.status === "FILE_NOT_FOUND") {
-        setDoesB2bDataJsonExist(false);
-      } else if (response.status === "OK") {
-        
-      }
-    })
 
+    if (res.status === 'OK') {
+      setDoesB2bDataJsonExist(true);
+      setB2bData(res.content);
+      setOrderNumber(res.content.orderNumber);
+      setOrderDate(res.content.orderDate);
+      setInvoiceDate(res.content.invoiceDate);
+      setRealizationDate(res.content.realizationDate);
+      setSpentHours(res.content.spentHours);
+    }
+  }
+
+  useEffect(() => {
     getSettings();
   }, []);
 
