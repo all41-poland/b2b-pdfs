@@ -1,5 +1,17 @@
 <p align="center"><img src="https://i.imgur.com/X7dSE68.png"></p>
 
+## MacOS application running
+
+After installation of application from provided build artifact, you will encounter "„B2B PDFs” is broken and can't be opened" error.
+
+To remove the error, you need to run:
+```sh
+$ sudo xattr -r -d com.apple.quarantine B2B\ PDFs.app
+
+eg. sudo xattr -r -d com.apple.quarantine /Applications/B2B\ PDFs.app
+```
+in order to allow application to run without need of signing the application itself.
+
 ## Usage
 
 ### Create an App

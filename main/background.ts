@@ -1,10 +1,9 @@
 import path from 'path'
 import { app } from 'electron'
 import serve from 'electron-serve'
-import { createWindow } from './helpers'
 import './appLogic/main';
-
-const isProd = process.env.NODE_ENV === 'production';
+import { createWindow } from './helpers/create-window';
+import { isProd } from './env';
 
 if (isProd) {
   serve({ directory: 'app' })

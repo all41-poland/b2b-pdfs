@@ -3,7 +3,6 @@ import Head from 'next/head';
 import { JsonResponse } from '../src/appInterfaces';
 import Loader from '../src/ui/Loader/Loader';
 import Button from '../src/ui/Button';
-import saveAs from 'file-saver';
 import { pdf } from '@react-pdf/renderer';
 import ProtocolPdfGenerator from '../src/ProtocolPdfGenerator/ProtocolPdfGenerator';
 import OrderPdfGenerator from '../src/OrderPdfGenerator/OrderPdfGenerator';
@@ -24,34 +23,39 @@ export default function NextPage() {
   const [doesB2bDataJsonExist, setDoesB2bDataJsonExist] = useState<boolean>();
 
   const fetchDataFromJson = () => {
-    //@ts-ignore
-    window.ipc.send('readFile', 'Hello')
+
   };
 
+  const getSettings = async () => {
+    const res = await window.ipc.invoke('settings:read');
+    if (res.status === "FILE_NOT_FOUND") {
+      setDoesB2bDataJsonExist(false);
+      return;
+    }
+
+    if (res.status === 'OK') {
+      setDoesB2bDataJsonExist(true);
+      setB2bData(res.content);
+      setOrderNumber(res.content.orderNumber);
+      setOrderDate(res.content.orderDate);
+      setInvoiceDate(res.content.invoiceDate);
+      setRealizationDate(res.content.realizationDate);
+      setSpentHours(res.content.spentHours);
+    }
+  }
+
   useEffect(() => {
-    fetchDataFromJson();
-    //@ts-ignore
-    window.ipc.on('readFile', (response: ResponseReadFile) => {
-      if (response.status === "FILE_NOT_FOUND") {
-        setDoesB2bDataJsonExist(false);
-      } else if (response.status === "OK") {
-        setDoesB2bDataJsonExist(true);
-        setB2bData(response.content);
-        setOrderNumber(response.content.orderNumber);
-        setOrderDate(response.content.orderDate);
-        setInvoiceDate(response.content.invoiceDate);
-        setRealizationDate(response.content.realizationDate);
-        setSpentHours(response.content.spentHours);
-      }
-    })
+    getSettings();
   }, []);
 
   const generatePdfDocuments = async () => {
     if (!b2bData || !orderDate || !orderNumber || !realizationDate || !invoiceDate || !spentHours) {
       return null;
     }
-    const protocolFileName = `Protokół odbioru prac ${orderNumber}.pdf`;
-    const orderFileName = `Zamówienie usług ${orderNumber}.pdf`;
+    const escapedOrderNumber = orderNumber.replace(/\//g, '_');
+    const protocolFileName = `Protokół odbioru prac ${escapedOrderNumber}.pdf`;
+    const orderFileName = `Zamówienie usług ${escapedOrderNumber}.pdf`;
+
     const blob1 = await pdf((
       <OrderPdfGenerator
         productName={b2bData.productName}
@@ -67,6 +71,12 @@ export default function NextPage() {
         clientCompany={b2bData.client}
       />
     )).toBlob();
+    const res = await window.ipc.invoke('saveFile', { data: await blob1.arrayBuffer(), fileName: orderFileName });
+      
+    if (res.status === "CANCELLED") {
+      return;
+    }
+
     const blob2 = await pdf((
       <ProtocolPdfGenerator
         orderNumber={orderNumber}
@@ -78,8 +88,7 @@ export default function NextPage() {
         clientFullName={b2bData.client.fullName}
       />
     )).toBlob();
-    saveAs(blob1, orderFileName);
-    saveAs(blob2, protocolFileName);
+    await window.ipc.invoke('saveFile', { data: await blob2.arrayBuffer(), fileName: protocolFileName });
   };
 
   const saveToFile = () => { // TODO
