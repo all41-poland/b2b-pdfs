@@ -2,7 +2,7 @@
   "private": true,
   "name": "b2b-pdfs",
   "description": "PDFs generator for B2B contactors",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "Szymon Szczepański",
   "main": "app/background.js",
   "scripts": {

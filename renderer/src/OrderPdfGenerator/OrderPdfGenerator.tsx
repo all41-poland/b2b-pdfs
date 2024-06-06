@@ -268,7 +268,7 @@ const OrderPdfGenerator = ({
         <View style={styles.singleSignature}>
           <Text style={styles.signatureValue}>{myName}</Text>
           <View style={styles.signatureLabel}>
-            <Text style={styles.signatureLabelText}>imię i nazwisko zamawiającego</Text>
+            <Text style={styles.signatureLabelText}>imię i nazwisko wykonawcy</Text>
           </View>
         </View>
         <View style={styles.singleSignature}>
