@@ -47,26 +47,27 @@ const generateEmptyFile = () => {
 
 const createFile = async () => {
   const emptyFile = generateEmptyFile();
-  saveFile(
+  await saveFile(
     JSON.stringify(emptyFile, null, 2),
     SETTINGS_FILE_NAME,
   )
 }
 
+export type ReadSettingsEventResult = {
+  status: "FILE_NOT_FOUND",
+  message: string,
+} | {
+  status: "OK",
+  content: ReturnType<typeof generateEmptyFile>,
+};
 export interface ReadSettingsEventHandler {
-  channel: 'settings:read:default';
+  channel: 'settings:read:default' | 'settings:read:custom' | 'settings:readandcreate';
   payload: undefined;
-  returnType: Promise<{
-    status: "FILE_NOT_FOUND",
-    message: string,
-  } | {
-    status: "OK",
-    content: ReturnType<typeof generateEmptyFile>,
-  }>
+  returnType: Promise<ReadSettingsEventResult>;
 }
 
 ipcMain.handle(
-  'settings:read:default' as ReadSettingsEventHandler['channel'],
+  'settings:readandcreate' as ReadSettingsEventHandler['channel'],
   async () => {
     const filePath = SETTINGS_FILE_PATH;
 
@@ -74,7 +75,7 @@ ipcMain.handle(
       await createFile();
       return {
         status: "FILE_NOT_FOUND",
-        message: "Plik nie został znaleziony. Utworzono nowy plik."
+        message: "Plik nie został znaleziony w domyślnej lokalizacji. Wygenerowano nowy plik."
       }
     } else {
       const fileContent = readFileSync(filePath, 'utf8');
@@ -84,7 +85,29 @@ ipcMain.handle(
         content: parsedContent,
       }
     }
-  })
+  }
+)
+
+ipcMain.handle(
+  'settings:read:default' as ReadSettingsEventHandler['channel'],
+  async () => {
+    const filePath = SETTINGS_FILE_PATH;
+
+    if (!existsSync(filePath)) {
+      return {
+        status: "FILE_NOT_FOUND",
+        message: "Plik nie został znaleziony w domyślnej lokalizacji."
+      }
+    } else {
+      const fileContent = readFileSync(filePath, 'utf8');
+      const parsedContent = JSON.parse(fileContent);
+      return {
+        status: "OK",
+        content: parsedContent,
+      }
+    }
+  }
+)
 
 ipcMain.handle(
   'settings:read:custom' as ReadSettingsEventHandler['channel'],
@@ -93,10 +116,9 @@ ipcMain.handle(
     const filePath = res.filePaths[0];
 
     if (!existsSync(filePath)) {
-      await createFile();
       return {
         status: "FILE_NOT_FOUND",
-        message: "Plik nie został znaleziony. Utworzono nowy plik."
+        message: "Plik nie został znaleziony."
       }
     } else {
       const fileContent = readFileSync(filePath, 'utf8');
@@ -106,4 +128,5 @@ ipcMain.handle(
         content: parsedContent,
       }
     }
-  })
+  }
+)

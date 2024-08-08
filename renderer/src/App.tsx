@@ -7,11 +7,12 @@ import { pdf } from '@react-pdf/renderer';
 import ProtocolPdfGenerator from '../src/ProtocolPdfGenerator/ProtocolPdfGenerator';
 import OrderPdfGenerator from '../src/OrderPdfGenerator/OrderPdfGenerator';
 import Input from '../src/ui/Input';
+import { ReadSettingsEventResult } from '../../main/appLogic/settings';
 
 const APPLICATION_NOT_LOADED = "Dane nie zostały jeszcze przygotowane...";
 const FILE_NOT_FOUND_TEXT = `Plik bazy danych "b2bdata.json" nie został znaleziony. 
   Musi się on znajdować w folderze "Documents/b2b-pdfs/" albo w miejscu gdzie znajduje się plik exe.
-  Kliknij przycisk Odśwież aby utworzyć pusty plik, a następnie go uzupełnij.
+  Stwórz nowy plik i następnie go uzupełnij lub otwórz juz istniejący plik.
   `;
 const FILE_NOT_FILLED_CORRECTLY = `Dane w pliku b2bdata.json nie zostały wypełnione poprawnie! 
 Plik znajduje się w folderze "Documents/b2b-pdfs/" albo w miejscu gdzie zlokalizowany jest plik exe.`;
@@ -25,8 +26,7 @@ export default function App() {
   const [spentHours, setSpentHours] = useState<number>();
   const [doesB2bDataJsonExist, setDoesB2bDataJsonExist] = useState<boolean>();
 
-  const readSettingsFromJsonFile = async () => {
-    const res = await window.ipc.invoke('settings:read:default');
+  const readSettings = async (res: ReadSettingsEventResult) => {
     if (res.status === "FILE_NOT_FOUND") {
       setDoesB2bDataJsonExist(false);
       return;
@@ -43,8 +43,26 @@ export default function App() {
     }
   }
 
+  const readSettingsFromDefaultJsonFile = async () => {
+    const res = await window.ipc.invoke('settings:read:default');
+    await readSettings(res);
+  }
+
+  const readSettingsFromCustomJsonFile = async () => {
+    const res = await window.ipc.invoke('settings:read:custom');
+    await readSettings(res);
+  }
+
+  const readSettingsAndCreateTemplate = async () => {
+    const res = await window.ipc.invoke('settings:readandcreate');
+    await readSettings(res);
+    if (res.status === "FILE_NOT_FOUND") {
+      readSettingsFromDefaultJsonFile();
+    }
+  }
+
   useEffect(() => {
-    readSettingsFromJsonFile();
+    readSettingsFromDefaultJsonFile();
   }, []);
 
   const generatePdfDocuments = async () => {
@@ -195,7 +213,8 @@ export default function App() {
           <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
           </span>
         </div>
-        <Button title='Odśwież' onClick={readSettingsFromJsonFile} />
+        <Button title='Stwórz nowy plik bazy danych' onClick={readSettingsAndCreateTemplate} />
+        <Button title='Otwórz istniejący plik bazy danych' onClick={readSettingsFromCustomJsonFile} />
       </div>
     )
   }
@@ -237,7 +256,7 @@ export default function App() {
           <span className="absolute top-0 bottom-0 right-0 px-4 py-3">
           </span>
         </div>
-        <Button title='Odśwież' onClick={readSettingsFromJsonFile} />
+        <Button title='Odśwież' onClick={readSettingsFromDefaultJsonFile} />
       </div>
     )
   }
