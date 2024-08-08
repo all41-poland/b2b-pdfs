@@ -8,9 +8,13 @@ import ProtocolPdfGenerator from '../src/ProtocolPdfGenerator/ProtocolPdfGenerat
 import OrderPdfGenerator from '../src/OrderPdfGenerator/OrderPdfGenerator';
 import Input from '../src/ui/Input';
 
-const FILE_NOT_FOUND_TEXT = "Plik b2bdata.json nie został znaleziony. Utworzono pustą templatkę. Uzupełnij go i odśwież stronę aby użyć aplikacji.";
-const APPLICATION_NOT_LOADED = "Dane nie zostały jeszcze przygotowane.";
-const FILE_NOT_FILLED_CORRECTLY = "Dane w pliku b2bdata.json nie zostały wypełnione poprawnie!";
+const APPLICATION_NOT_LOADED = "Dane nie zostały jeszcze przygotowane...";
+const FILE_NOT_FOUND_TEXT = `Plik bazy danych "b2bdata.json" nie został znaleziony. 
+  Musi się on znajdować w folderze "Documents/b2b-pdfs/" albo w miejscu gdzie znajduje się plik exe.
+  Kliknij przycisk Odśwież aby utworzyć pusty plik, a następnie go uzupełnij.
+  `;
+const FILE_NOT_FILLED_CORRECTLY = `Dane w pliku b2bdata.json nie zostały wypełnione poprawnie! 
+Plik znajduje się w folderze "Documents/b2b-pdfs/" albo w miejscu gdzie zlokalizowany jest plik exe.`;
 
 export default function App() {
   const [b2bData, setB2bData] = useState<JsonResponse>();
