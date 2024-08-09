@@ -2,12 +2,15 @@
   "private": true,
   "name": "b2b-pdfs",
   "description": "PDFs generator for B2B contactors",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "author": "Szymon Szczepański",
   "main": "app/background.js",
   "scripts": {
     "dev": "nextron",
     "build": "nextron build",
+    "build:win64": "nextron build --win --x64",
+    "build:mac": "nextron build --mac",
+    "build:mac:universal": "nextron build --mac --universal",
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
