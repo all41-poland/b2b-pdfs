@@ -14,6 +14,8 @@
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
+    "@mantine/core": "^7.13.1",
+    "@mantine/hooks": "^7.13.1",
     "@react-pdf/renderer": "^3.4.2",
     "electron-serve": "^1.3.0",
     "electron-store": "^8.1.0",
