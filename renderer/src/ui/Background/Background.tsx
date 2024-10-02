@@ -87,7 +87,6 @@ const Orbs = memo(({ hue }: { hue: number }) => {
 });
 
 const Background = () => {
-  // const [hue, setHue] = useState(random(0, 360));
   const [hue, setHue] = useState(210);
 
   const randomizeColor = () => setHue(random(0, 360));

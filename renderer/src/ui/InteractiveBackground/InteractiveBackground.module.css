@@ -1,0 +1,13 @@
+.wrapper {
+  z-index: -1;
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  background: #3300FF55;
+
+}
+
+.wrapper :global(canvas) {
+  position: fixed;
+  z-index: -1;
+}

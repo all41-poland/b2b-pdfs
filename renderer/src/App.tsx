@@ -8,7 +8,8 @@ import ProtocolPdfGenerator from '../src/ProtocolPdfGenerator/ProtocolPdfGenerat
 import OrderPdfGenerator from '../src/OrderPdfGenerator/OrderPdfGenerator';
 import Input from '../src/ui/Input';
 import { ReadSettingsEventResult } from '../../main/appLogic/settings';
-import Background from './ui/Background';
+import Background from './ui/Background/Background';
+import InteractiveBackground from './ui/InteractiveBackground/InteractiveBackground';
 
 const APPLICATION_NOT_LOADED = "Dane nie zostały jeszcze przygotowane...";
 const FILE_NOT_FOUND_TEXT = `Plik bazy danych "b2bdata.json" nie został znaleziony. 
@@ -268,7 +269,8 @@ export default function App() {
         <title>B2B PDFs</title>
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-between p-24">
-        <Background />
+        {/* <Background /> */}
+        <InteractiveBackground />
         <div className="relative flex flex-col place-items-center">
           <Input label='Numer zamówienia' value={orderNumber} onChange={handleChangeOrderNumber} />
           <Input label='Data zamówienia' value={orderDate} onChange={handleChangeOrderDate} />
