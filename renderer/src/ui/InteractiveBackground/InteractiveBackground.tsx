@@ -87,7 +87,7 @@ const InteractiveBackground = () => {
     const resultComponent = init();
     ref.current.appendChild(resultComponent);
     ref.current.style.touchAction = 'none'
-    ref.current.addEventListener('pointermove', onPointerMove)
+    document.body.addEventListener('pointermove', onPointerMove)
     window.addEventListener('resize', onWindowResize)
     animate();
   }
