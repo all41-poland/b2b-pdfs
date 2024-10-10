@@ -9,6 +9,7 @@ import OrderPdfGenerator from '../src/OrderPdfGenerator/OrderPdfGenerator';
 import Input from '../src/ui/Input';
 import { ReadSettingsEventResult } from '../../main/appLogic/settings';
 import Background from './ui/Background/Background';
+import { Center } from '@mantine/core';
 import InteractiveBackground from './ui/InteractiveBackground/InteractiveBackground';
 
 const APPLICATION_NOT_LOADED = "Dane nie zostały jeszcze przygotowane...";
@@ -182,11 +183,35 @@ export default function App() {
       return null;
     }
     return (
-      <div className="m-8 flex flex-col">
-        <Button title="Pobierz dokumenty" icon='download' onClick={generatePdfDocuments} />
-        <Button isDisabled title="Zapisz obecne dane do pliku" onClick={saveToFile} />
-        <Button title="Inkrementuj inputy" onClick={incrementInputs} />
-      </div>
+      <Center style={{
+        margin: "1rem",
+        flexDirection: "column"
+      }}>
+        <Center style={{
+          margin: "0.5rem"
+        }}>
+          <Button
+            title="Pobierz dokumenty"
+            icon='download'
+            onClick={generatePdfDocuments}
+          />
+        </Center>
+        <Center style={{
+          margin: "0.5rem"
+        }}>
+          <Button
+            isDisabled
+            icon='save'
+            title="Zapisz obecne dane do pliku"
+            onClick={saveToFile}
+          />
+          <Button
+            icon='next'
+            title="Inkrementuj inputy"
+            onClick={incrementInputs}
+          />
+        </Center>
+      </Center>
     )
   }
 
