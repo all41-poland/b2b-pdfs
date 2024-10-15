@@ -52,6 +52,7 @@ const Orb = ({ hue }: { hue: number }) => {
         cx={from[0]} cy={to[0]} r={r}
         fill={`url(#grad-${id})`}
         style={{
+          // @ts-ignore
           '--duration': `${d / 15}s`,
           '--from-x': from[0],
           '--from-y': from[1],
